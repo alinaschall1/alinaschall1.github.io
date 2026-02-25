@@ -1,0 +1,24 @@
+---
+title: "Welcome to My Website"
+subtitle: "Alina Schall | M.Sc. Statistische Wissenschaften, Bielefeld University"
+output: html_document
+toc: false
+
+#image: 
+about: 
+ template: marquee
+ image-shape: rounded
+---
+
+## About Me
+
+Hi there! I'm Alina, a passionate researcher, R programmer, and lifelong learner. Here you'll find information about my background, skills, and education. Whether you're a potential employer, colleague, or collaborator, I'm excited to share my journey with you.
+
+## Dive into My R Projects
+
+Explore my portfolio of R projects.
+
+
+## Connect with Me
+
+Interested in collaborating on a project or discussing data science topics? Connect with me via email at alina.schall\@uni-bielefeld.de

@@ -1,0 +1,107 @@
+[
+  {
+    "objectID": "proj1.html",
+    "href": "proj1.html",
+    "title": "Bootstrapping Examples in R",
+    "section": "",
+    "text": "What is Bootstrapping?\nBootstrapping is a procedure for estimating the distribution of an estimator by resampling (often with replacement) from the data or from a fitted model.\nIt assigns measures of accuracy (bias, variance, confidence intervals, prediction error) to sample estimates and allows estimation of the sampling distribution of almost any statistic using simulation.\nI use rnorm function (randomize + normal distribution) to generate a practice set of data.\nFit model\nset.seed(123)\n\nx &lt;- rnorm(50, mean = 10, sd = 2)\nn &lt;- length(x)\n\nmu_hat &lt;- mean(x)\nsd_hat &lt;- sd(x)\nRun bootstrap\nB &lt;- 1000\nmu_boot &lt;- numeric(B)\n\nfor (b in 1:B) {\n  x_star &lt;- rnorm(n, mean = mu_hat, sd = sd_hat)\n  mu_boot[b] &lt;- mean(x_star)\n}\nresults\nboot_mean &lt;- mean(mu_boot)\nboot_se &lt;- sd(mu_boot)\nci &lt;- quantile(mu_boot, c(0.025, 0.975))\n\nboot_mean\n\n[1] 10.06563\n\nboot_se\n\n[1] 0.2470952\n\nci\n\n     2.5%     97.5% \n 9.585642 10.531793"
+  },
+  {
+    "objectID": "proj1.html#example-for-linear-regression",
+    "href": "proj1.html#example-for-linear-regression",
+    "title": "Bootstrapping Examples in R",
+    "section": "Example for linear regression",
+    "text": "Example for linear regression\n\nset.seed(123)\n\nn &lt;- 100\nx &lt;- runif(n, 0, 10)\ny &lt;- 5 + 2 * x + rnorm(n, 0, 2)\n\nFit linear model\n\nfit &lt;- lm(y ~ x)\nsummary(fit)\n\n\nCall:\nlm(formula = y ~ x)\n\nResiduals:\n    Min      1Q  Median      3Q     Max \n-4.4759 -1.2265 -0.0395  1.1927  4.4345 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)  4.98208    0.39211   12.71   &lt;2e-16 ***\nx            1.98203    0.06836   28.99   &lt;2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 1.939 on 98 degrees of freedom\nMultiple R-squared:  0.8956,    Adjusted R-squared:  0.8945 \nF-statistic: 840.6 on 1 and 98 DF,  p-value: &lt; 2.2e-16\n\n\nExtract parameters\n\nbeta_hat &lt;- coef(fit) \nsigma_hat &lt;- summary(fit)$sigma\n\nBootstrap\n\nB &lt;- 1000\nbeta_boot &lt;- matrix(NA, nrow = B, ncol = length(beta_hat))\n\nfor (b in 1:B) {\n  y_star &lt;- beta_hat[1] + beta_hat[2] * x + rnorm(n, 0, sigma_hat)\n  fit_star &lt;- lm(y_star ~ x)\n  beta_boot[b, ] &lt;- coef(fit_star)\n}\n\nResults\n\nboot_means &lt;- colMeans(beta_boot)\nboot_ses &lt;- apply(beta_boot, 2, sd)\nboot_ci &lt;- apply(beta_boot, 2, quantile, probs = c(0.025, 0.975))\n\nboot_means\n\n[1] 4.956659 1.987527\n\nboot_ses\n\n[1] 0.39379308 0.06913355\n\nboot_ci\n\n          [,1]     [,2]\n2.5%  4.226149 1.858384\n97.5% 5.727671 2.115856"
+  },
+  {
+    "objectID": "proj1.html#example-for-logistic-regression",
+    "href": "proj1.html#example-for-logistic-regression",
+    "title": "Bootstrapping Examples in R",
+    "section": "Example for logistic regression",
+    "text": "Example for logistic regression\nGenerate data using runif (randomize uniform distribution)\n\nset.seed(123)\n\nn &lt;- 200\nx &lt;- runif(n, 0, 10)\n\nbeta0 &lt;- -2\nbeta1 &lt;- 0.5\n\np &lt;- 1 / (1 + exp(-(beta0 + beta1 * x)))\ny &lt;- rbinom(n, 1, p)\n\ndata &lt;- data.frame(y = y, x = x)\n\nfit &lt;- glm(y ~ x,\n           family = binomial(link = \"logit\"),\n           data = data)\n\nsummary(fit)\n\n\nCall:\nglm(formula = y ~ x, family = binomial(link = \"logit\"), data = data)\n\nCoefficients:\n            Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept) -1.77952    0.36534  -4.871 1.11e-06 ***\nx            0.47483    0.07425   6.395 1.61e-10 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for binomial family taken to be 1)\n\n    Null deviance: 267.50  on 199  degrees of freedom\nResidual deviance: 210.62  on 198  degrees of freedom\nAIC: 214.62\n\nNumber of Fisher Scoring iterations: 4\n\n\nExtract estimated parameters\n\nbeta_hat &lt;- coef(fit)\n\nB &lt;- 1000\nbeta_boot &lt;- matrix(NA, nrow = B, ncol = length(beta_hat))\n\n\nfor (b in 1:B) {\n  p_hat &lt;- 1 / (1 + exp(-(beta_hat[1] + beta_hat[2] * x)))\n  y_star &lt;- rbinom(n, 1, p_hat)\n  \n  fit_star &lt;- glm(y_star ~ x,\n                  family = binomial(link = \"logit\"))\n  \n  beta_boot[b, ] &lt;- coef(fit_star)\n}\n\ncolnames(beta_boot) &lt;- names(beta_hat)\n\nResults\n\nboot_means &lt;- colMeans(beta_boot)\nboot_ses &lt;- apply(beta_boot, 2, sd)\nboot_ci &lt;- apply(beta_boot, 2, quantile, probs = c(0.025, 0.975))\n\nresults &lt;- data.frame(\n  Estimate = beta_hat,\n  BootMean = boot_means,\n  BootSE = boot_ses,\n  CI_lower = boot_ci[1, ],\n  CI_upper = boot_ci[2, ]\n)\n\nprint(results)\n\n             Estimate   BootMean     BootSE   CI_lower  CI_upper\n(Intercept) -1.779518 -1.8127758 0.37463075 -2.5968318 -1.133648\nx            0.474827  0.4839984 0.07756396  0.3501373  0.649960\n\n\nlets graph both intercept and slope using histogram\n\npar(mfrow = c(1, 2))\n\nhist(beta_boot[,1],\n     main = \"Bootstrap Intercept\",\n     xlab = \"beta0*\",\n     breaks = 30)\nabline(v = beta_hat[1], col = \"red\", lwd = 2)\n\nhist(beta_boot[,2],\n     main = \"Bootstrap Slope\",\n     xlab = \"beta1*\",\n     breaks = 30)\nabline(v = beta_hat[2], col = \"red\", lwd = 2)"
+  },
+  {
+    "objectID": "help.html",
+    "href": "help.html",
+    "title": "Help Page",
+    "section": "",
+    "text": "For detailed information on how to create a Quarto website, please visit Quarto’s Help Center.\n\nProject Files\nA Quarto website has:\n\n_quarto.yml → controls the entire website\n.qmd files → individual pages\nimages folder → store images\ndocs folder → Github pages access (do not touch the docs folder)\nstyles.css → styling specific pages\n.gitignore and .Rhistory → not too important, I would not touch\n.RData → data storage\nREADME.md → general instructions on how to publish website in case you need help later\n\nIf something changes across the whole website, edit _quarto.yml. If something changes on one page only, edit that page’s YAML.\n\n\nRender Website\nIf you want to preview your website locally, you can either\n\n\nclick render on the top left of RStudio\n\nor\n\ngo to terminal, and type quarto preview\n\n\n\nYAML\nwebsite:\n  title: \"My Portfolio\" # name your website\n  navbar: # navigation between pages\n    left: # chose where you want your nav bar to be located\n      - text: \"Home\" # the text diplayed\n        href: index.qmd # the name of the file linked to the text\n      - text: \"About Me\"\n        menu:  # add nested pages\n          - text: \"My Resume\"\n            href: about.qmd\n          - text: \"Political & Environmental Activism\"\n            href: active.qmd\nYAML indentation MUST use spaces, not tabs. Indentation defines hierarchy. A misplaced space will cause errors for your site.\nUseful advanced options:\n\ndraft: true → hides page from rendering\nfreeze: auto → avoids re-running heavy computations\npage-layout: full → removes side margins\npage-layout: article → default blog style\n\n\n\nStyles\nTo create the CSS File, click File → New File → Text File, and name the file however you like but make sure it ends with styles.css like the one in Owen’s template.\nTo link the styles.css file to a page of your choice, go to the yml code at the top of qmd file and paste the name of your css file\nformat:\n  html:\n    css: cv-styles.css\nTo learn how the css code works you can visit this youtube link:\nCustomize appearance with CSS/SCSS\nor visit Quarto’s Website\n\n\nImages\nAlways store images in the images folder.\nTo add an image, the easiest way is to first make sure you are in visual mode, then click insert, then click Figure/Image and chose the file on your computer.\n\n\nPublish Website\nYou will need an access token in order to link and publish your Quarto website on Github.\nIn Github, click Profile picture → Settings → Developer settings → Personal access tokens → Fine-grained tokens → generate new token\nWhen creating the token,\n\nyou must click Repository access, then choose “Only selected repositories”, and select your website repository\nclick Permissions, then click “Contents: Read and write” and “Metadata: Read-only”\nclick generate token\n!!Copy the token immediately!! save the token somewhere, once you leave the page, you cannot access the token again.\n\nGo back to RStudio and install the package gitcreds.\nOnce installed, load the package into your library, and open your R console. Type the following into your console\n\ngitcreds::gitcreds_set()\n\nthen paste the access token into your console and press enter your github should be linked now\nTo publish your website, open your terminal and type each line of code below and press enter after each command separately:\n\ngit init\nquarto render\ngit remote add origin https://github.com/USERNAME/REPOSITORY.git\ngit add -A\ngit commit -m “Update website”\ngit push\n\nIf you check your repository on Github, you should see the updated pages, then click the link on the right and you should be able to see your published website\nIf you want to update your website, then you only need to execute the following commands in your terminal again\n\nquarto render\ngit add -A\ngit commit -m “Update website”\ngit push"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Curriculum Vitae",
+    "section": "",
+    "text": "M.Sc. Statistical Sciences\nBielefeld University\n\n\n\n\n\nM.Sc. Statistische Wissenschaften\nBielefeld University, Germany\n\n\n10/2025 – Present\n\n\n\n\nB.A. Social Sciences (Minor:Sociology)\nBielefeld University, Germany\n\n\n10/2021 – 04/2025\n\n\n\n\n\n\n\n\nSocial studies at SOKO\nSOKO (Institution for communication and social studies - Bielefeld, Germany\n\n\n02/2022 – 10/2022\n\n\n\n\nPrivate Statistics Tutor\nSelf-employed, Bielefeld, Germany\n\n\n03/2024 – Present\n\n\n\n\n\n\nSoftware: RStudio, Stata, Microsoft Office\n\n\n\n\nGerman (native) Russian (native) English(fluent)\n\n\n\n\nIntercultural competence\nInternational Mentoring Programme Bielefeld University"
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "Curriculum Vitae",
+    "section": "",
+    "text": "M.Sc. Statistische Wissenschaften\nBielefeld University, Germany\n\n\n10/2025 – Present\n\n\n\n\nB.A. Social Sciences (Minor:Sociology)\nBielefeld University, Germany\n\n\n10/2021 – 04/2025"
+  },
+  {
+    "objectID": "about.html#professional-experience",
+    "href": "about.html#professional-experience",
+    "title": "Curriculum Vitae",
+    "section": "",
+    "text": "Social studies at SOKO\nSOKO (Institution for communication and social studies - Bielefeld, Germany\n\n\n02/2022 – 10/2022\n\n\n\n\nPrivate Statistics Tutor\nSelf-employed, Bielefeld, Germany\n\n\n03/2024 – Present"
+  },
+  {
+    "objectID": "about.html#skills",
+    "href": "about.html#skills",
+    "title": "Curriculum Vitae",
+    "section": "",
+    "text": "Software: RStudio, Stata, Microsoft Office"
+  },
+  {
+    "objectID": "about.html#languages",
+    "href": "about.html#languages",
+    "title": "Curriculum Vitae",
+    "section": "",
+    "text": "German (native) Russian (native) English(fluent)"
+  },
+  {
+    "objectID": "about.html#certifications",
+    "href": "about.html#certifications",
+    "title": "Curriculum Vitae",
+    "section": "",
+    "text": "Intercultural competence\nInternational Mentoring Programme Bielefeld University"
+  },
+  {
+    "objectID": "active.html",
+    "href": "active.html",
+    "title": "Volunteer work",
+    "section": "",
+    "text": "volunteer tutor for socially disadvantaged children\nBielefeld,Germany Studenten bilden Schüler e.V.\nvolunteer mentor for international students\nBielefeld University, International Office"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to My Website",
+    "section": "",
+    "text": "Hi there! I’m Alina, a passionate researcher, R programmer, and lifelong learner. Here you’ll find information about my background, skills, and education. Whether you’re a potential employer, colleague, or collaborator, I’m excited to share my journey with you."
+  },
+  {
+    "objectID": "index.html#about-me",
+    "href": "index.html#about-me",
+    "title": "Welcome to My Website",
+    "section": "",
+    "text": "Hi there! I’m Alina, a passionate researcher, R programmer, and lifelong learner. Here you’ll find information about my background, skills, and education. Whether you’re a potential employer, colleague, or collaborator, I’m excited to share my journey with you."
+  },
+  {
+    "objectID": "index.html#dive-into-my-r-projects",
+    "href": "index.html#dive-into-my-r-projects",
+    "title": "Welcome to My Website",
+    "section": "Dive into My R Projects",
+    "text": "Dive into My R Projects\nExplore my portfolio of R projects."
+  },
+  {
+    "objectID": "index.html#connect-with-me",
+    "href": "index.html#connect-with-me",
+    "title": "Welcome to My Website",
+    "section": "Connect with Me",
+    "text": "Connect with Me\nInterested in collaborating on a project or discussing data science topics? Connect with me via email at alina.schall@uni-bielefeld.de"
+  }
+]

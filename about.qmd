@@ -1,0 +1,92 @@
+---
+title: "Curriculum Vitae"
+page-layout: full
+toc: false
+format:
+  html:
+    theme: cosmo
+    css: cv-styles.css
+    page-layout: full
+---
+
+::::::::::::::: cv-container
+# Alina Schall
+
+**M.Sc. Statistical Sciences**\
+Bielefeld University
+
+------------------------------------------------------------------------
+
+## Education
+
+::::: cv-item
+::: cv-left
+**M.Sc. Statistische Wissenschaften**\
+Bielefeld University, Germany
+:::
+
+::: cv-right
+10/2025 – Present
+:::
+:::::
+
+::::: cv-item
+::: cv-left
+**B.A. Social Sciences (Minor:Sociology)**\
+Bielefeld University, Germany
+:::
+
+::: cv-right
+10/2021 – 04/2025
+:::
+:::::
+
+------------------------------------------------------------------------
+
+## Professional Experience
+
+::::: cv-item
+::: cv-left
+**Social studies at SOKO**\
+SOKO (Institution for communication and social studies - Bielefeld, Germany
+:::
+
+::: cv-right
+02/2022 – 10/2022
+:::
+:::::
+
+::::: cv-item
+::: cv-left
+**Private Statistics Tutor**\
+Self-employed, Bielefeld, Germany
+:::
+
+::: cv-right
+03/2024 – Present
+:::
+:::::
+
+------------------------------------------------------------------------
+
+## Skills
+
+**Software:** RStudio, Stata, Microsoft Office
+
+------------------------------------------------------------------------
+
+## Languages
+
+**German** (native)
+**Russian** (native)
+**English**(fluent)
+
+------------------------------------------------------------------------
+
+## Certifications
+
+**Intercultural competence**\
+International Mentoring Programme Bielefeld University
+
+------------------------------------------------------------------------
+:::::::::::::::
