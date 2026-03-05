@@ -9,7 +9,7 @@ format:
     page-layout: full
 ---
 
-::::::::::::::: cv-container
+::::::::::::::::::::: cv-container
 # Alina Schall
 
 **M.Sc. Statistical Sciences**\
@@ -41,6 +41,19 @@ Bielefeld University, Germany
 :::
 :::::
 
+::::: cv-item
+::: cv-left
+**CUMIN**\
+Curriculum zur medizinischen Interessensförderung und interdisziplinären Netzwerkbildung für IT- und naturwissenschaftlichen Nachwuchs 
+Bielefeld University, Germany
+:::
+
+::: cv-right
+03/2026 – Present
+:::
+:::::
+
+
 ------------------------------------------------------------------------
 
 ## Professional Experience
@@ -48,7 +61,7 @@ Bielefeld University, Germany
 ::::: cv-item
 ::: cv-left
 **Social studies at SOKO**\
-SOKO (Institution for communication and social studies - Bielefeld, Germany
+SOKO (Institution for communication and social studies) - Bielefeld, Germany
 :::
 
 ::: cv-right
@@ -77,9 +90,7 @@ Self-employed, Bielefeld, Germany
 
 ## Languages
 
-**German** (native)
-**Russian** (native)
-**English**(fluent)
+**German** (native) **Russian** (native) **English**(fluent)
 
 ------------------------------------------------------------------------
 
@@ -89,4 +100,4 @@ Self-employed, Bielefeld, Germany
 International Mentoring Programme Bielefeld University
 
 ------------------------------------------------------------------------
-:::::::::::::::
+:::::::::::::::::::::

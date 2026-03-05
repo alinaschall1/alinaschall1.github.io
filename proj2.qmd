@@ -1,0 +1,160 @@
+---
+title: "Create your own App"
+format: html
+editor: 
+  markdown: 
+    wrap: 72
+---
+With the r package shiny you can create your own app. 
+One example is an app, that automatically gives you an overview over your data, and plots basic histogramms for an uploaded csv file.
+
+Download and open packages 
+
+```{r}
+library(shiny)
+library(bslib)
+library(dplyr)
+library(ggplot2) 
+library(plotly)
+library(lubridate)
+
+```
+
+open the app with the following code:
+```{r}
+ui <- page_sidebar(
+  
+  theme = bs_theme(bootswatch = "flatly"),
+  
+  title = "Data Explorer",
+  
+  sidebar = sidebar(
+    
+    fileInput("file", "Upload CSV", accept = ".csv"),
+    
+    uiOutput("var_select"),
+    
+    uiOutput("date_filter"),
+    
+    uiOutput("numeric_filter")
+  ),
+  
+  layout_column_wrap(
+    width = 1/2,
+    value_box(
+      title = "Rows",
+      textOutput("rows")
+    ),
+    value_box(
+      title = "Time span",
+      textOutput("timespan")
+    )
+  ),
+  
+  navset_tab(
+    nav_panel("Plot", plotlyOutput("plot")),
+    nav_panel("Table", tableOutput("table")),
+    nav_panel("Summary", verbatimTextOutput("summary"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  # Daten laden
+  df <- reactive({
+    req(input$file)
+    read.csv(input$file$datapath)
+  })
+  
+  # Variable auswählen (nur numerisch)
+  output$var_select <- renderUI({
+    req(df())
+    numeric_vars <- names(df())[sapply(df(), is.numeric)]
+    selectInput("var", "Variable", choices = numeric_vars)
+  })
+  
+  # Datum-Filter falls Datum vorhanden
+  output$date_filter <- renderUI({
+    req(df())
+    date_vars <- names(df())[sapply(df(), inherits, "Date")]
+    
+    if (length(date_vars) > 0) {
+      dateRangeInput(
+        "date_range",
+        "Date range",
+        start = min(df()[[date_vars[1]]], na.rm = TRUE),
+        end   = max(df()[[date_vars[1]]], na.rm = TRUE)
+      )
+    }
+  })
+  
+  # Numerischer Filter
+  output$numeric_filter <- renderUI({
+    req(df(), input$var)
+    
+    sliderInput(
+      "num_range",
+      "Value range",
+      min = min(df()[[input$var]], na.rm = TRUE),
+      max = max(df()[[input$var]], na.rm = TRUE),
+      value = range(df()[[input$var]], na.rm = TRUE)
+    )
+  })
+  
+  # Gefilterte Daten
+  filtered_data <- reactive({
+    req(df(), input$var)
+    
+    data <- df()
+    
+    # numerischer Filter
+    data <- data %>%
+      filter(
+        .data[[input$var]] >= input$num_range[1],
+        .data[[input$var]] <= input$num_range[2]
+      )
+    
+    data
+  })
+  
+  # Value Boxes
+  output$rows <- renderText({
+    nrow(filtered_data())
+  })
+  
+  output$timespan <- renderText({
+    if ("date_range" %in% names(input)) {
+      paste(input$date_range[1], "—", input$date_range[2])
+    } else {
+      "No date column"
+    }
+  })
+  
+  # Plot
+  output$plot <- renderPlotly({
+    req(input$var)
+    
+    p <- ggplot(filtered_data(), aes(x = .data[[input$var]])) +
+      geom_histogram(fill = "#2c3e50", color = "white", bins = 30) +
+      theme_minimal()
+    
+    ggplotly(p)
+  })
+  
+  # Tabelle
+  output$table <- renderTable({
+    head(filtered_data(), 20)
+  })
+  
+  # Summary
+  output$summary <- renderPrint({
+    summary(filtered_data())
+  })
+}
+
+shinyApp(ui, server)
+
+
+```
+
+

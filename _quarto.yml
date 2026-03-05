@@ -1,10 +1,13 @@
 project:
   type: website
   output-dir: docs
+
   
 website:
   title: "My Portfolio"
   navbar:
+    background: "white"
+    foreground: "black"
     left:
       - text: "Home"
         href: index.qmd
@@ -17,7 +20,9 @@ website:
       - text: "My Projects" 
         menu: 
         - text: "Bootstraping Example"
-          href: proj1.qmd          
+          href: proj1.qmd 
+        - text: "Shiny App Example"
+          href: proj2.qmd
       - text: "Help"
         href: help.qmd
     sidebar: false
@@ -32,7 +37,9 @@ website:
 
 format:
   html:
-   backgroundcolor: "lightpink"
+   backgroundcolor: "#FFF5EE"
+   navbarcolor: "white"
+   menucolor: "white"
 #    fontcolor: "green"
 #    linkcolor: "darkgreen"
    mainfont: "sarif"
